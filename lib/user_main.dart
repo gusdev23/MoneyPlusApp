@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_plus_app/main.dart';
 import 'package:money_plus_app/user_screens/balance_screen.dart';
 import 'package:money_plus_app/user_screens/egreso_screen.dart';
 import 'package:money_plus_app/user_screens/ingreso_screen.dart';
@@ -32,15 +33,32 @@ class _UserMain extends State<UserMain> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Money+',
+          title: Text(
+            'Money+',
             style: TextStyle(
-              color: Color.fromARGB(255, 175, 169, 84), 
-              fontSize: 27.0, 
+              color: Color.fromARGB(255, 175, 169, 84),
+              fontSize: 27.0,
             ),
           ),
           backgroundColor: Color(0xFF041F33),
           centerTitle: true,
-            toolbarHeight: 40.0,
+          toolbarHeight: 40.0,
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.exit_to_app,
+                color: Colors.white, // Cambia el color del icono aquí
+              ),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyApp(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
         
         body: AnimatedSwitcher(

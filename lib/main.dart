@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_plus_app/user_main.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 void main() {
   runApp(const MyApp());
@@ -60,6 +61,8 @@ class MiCuentaView extends StatelessWidget{
 
 
 class LoginForm extends StatelessWidget {
+  final TextEditingController usuarioController = TextEditingController();
+  final TextEditingController contrasenaController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -69,21 +72,40 @@ class LoginForm extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center, // Centra horizontalmente
         children: [
           TextFormField(
+            controller: usuarioController,
             decoration: InputDecoration(labelText: 'Usuario'),
           ),
           TextFormField(
+            controller: contrasenaController,
             decoration: InputDecoration(labelText: 'Contraseña'),
             obscureText: true,
           ),
           ElevatedButton(
             onPressed: () {
+              String usuario = usuarioController.text;
+              String contrasena = contrasenaController.text;
+              if(usuario=="guss"&& contrasena=="1234"){
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserMain(),
+                  ),
+                );
+              }
+              else{
+                Fluttertoast.showToast(
+                  msg: 'Inicio de sesión incorrecto',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.SNACKBAR,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: const Color.fromARGB(255, 165, 48, 39),
+                  textColor: Colors.white,
+                  fontSize: 23.0,
+                );
+                usuarioController.text="";
+                contrasenaController.text="";
+              }
               
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => UserMain(),
-                ),
-              );
             },
             child: Text('Ingresar'),
             style: ButtonStyle(
