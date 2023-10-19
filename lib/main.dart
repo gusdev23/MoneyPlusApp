@@ -84,7 +84,7 @@ class LoginForm extends StatelessWidget {
             onPressed: () {
               String usuario = usuarioController.text;
               String contrasena = contrasenaController.text;
-              if(usuario=="guss"&& contrasena=="1234"){
+              if(usuario==""&& contrasena==""){
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
