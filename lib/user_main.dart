@@ -85,7 +85,7 @@ class _UserMain extends State<UserMain> {
           ],
           currentIndex: _selectedIndex,
           selectedItemColor: Color.fromARGB(255, 175, 169, 84),
-          backgroundColor:Color(0xFF041F35),
+          unselectedItemColor: Color(0xFF041F35),
           onTap: _onItemTapped,
         ),
       ),

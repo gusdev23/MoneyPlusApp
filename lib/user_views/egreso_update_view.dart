@@ -62,10 +62,7 @@ class _EgresoUpdateViewState extends State<EgresoUpdateView> {
 
                 return GestureDetector(
                   onTap: () {
-                    setState(() {
-                      // Cambia la escala al tocar el Card
-                      cardScale = 0.95;
-                    });
+                    
 
                     // Retrasa la navegación al modal para que la animación sea visible
                     Future.delayed(Duration(milliseconds: 300), () {
