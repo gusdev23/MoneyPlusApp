@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_plus_app/user_views/meta_add_view.dart';
 import 'package:money_plus_app/user_views/meta_info_view.dart';
 
 class MetasView extends StatelessWidget {
@@ -138,7 +139,12 @@ class MetasView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          
+          Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MetaAddView(),
+                ),
+              );
         },
         child: Icon(Icons.add_to_photos_rounded),
       ),
