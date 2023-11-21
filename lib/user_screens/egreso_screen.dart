@@ -4,6 +4,8 @@ import 'package:money_plus_app/user_views/egreso_dashboard_view.dart';
 import 'package:money_plus_app/user_views/egreso_update_view.dart';
 
 class EgresoScreen extends StatelessWidget{
+  final String DocId;
+  EgresoScreen({required this.DocId});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,9 +27,9 @@ class EgresoScreen extends StatelessWidget{
           ),
           body: TabBarView(
             children: [
-              EgresoDashboardView(),
-              EgresoAddView(),
-              EgresoUpdateView(),
+              EgresoDashboardView(DocId: DocId),
+              EgresoAddView(DocId: DocId),
+              EgresoUpdateView(DocId: DocId),
             ],
           ),
         ),

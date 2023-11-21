@@ -1,52 +1,127 @@
-
-
-  
-
-
-
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class IngresoUpdateView extends StatefulWidget {
-  final List<Map<String, dynamic>> jsonData = [
-    {
-      "tipo": "Nomina",
-      "descripcion": "Pago recibido de nomina mensual",
-      "monto": "5000",
-    },
-       {
-      "tipo": "Donación familiar",
-      "descripcion": "Ingreso proporcionado por familiar",
-      "monto": "2000",
-    },
-       {
-      "tipo": "Utilidad negocio/empresa",
-      "descripcion": "Ganancias negocio dulces",
-      "monto": "1000",
-    },
-       {
-      "tipo": "Donación familiar",
-      "descripcion": "Dinero de mi papá",
-      "monto": "2355",
-    },
-       {
-      "tipo": "Utilidad negocio/empresa",
-      "descripcion": "Ganancias de ventas",
-      "monto": "9000",
-    },
-       {
-      "tipo": "Donación familiar",
-      "descripcion": "Dinero de mi mamá",
-      "monto": "1300",
-    },
-    // Agrega más elementos JSON según sea necesario
-  ];
+  final String DocId;
+
+  IngresoUpdateView({required this.DocId});
 
   @override
   _IngresoUpdateViewState createState() => _IngresoUpdateViewState();
 }
 
 class _IngresoUpdateViewState extends State<IngresoUpdateView> {
+  List<Map<String, dynamic>> jsonData = [];
   double cardScale = 1.0;
+
+  // Controladores para los campos del formulario
+  TextEditingController tipoController = TextEditingController();
+  TextEditingController descripcionController = TextEditingController();
+  TextEditingController montoController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    obtenerColeccionIngresos();
+  }
+
+  Future<void> obtenerColeccionIngresos() async {
+    try {
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(widget.DocId);
+
+      CollectionReference ingresosCollectionRef =
+          userDocRef.collection('ingresos');
+
+      QuerySnapshot ingresosQuerySnapshot =
+          await ingresosCollectionRef.get();
+
+      jsonData = ingresosQuerySnapshot.docs.map((ingresoDoc) {
+        Map<String, dynamic> datosIngreso = ingresoDoc.data() as Map<String, dynamic>;
+        datosIngreso['id'] = ingresoDoc.id; // Agrega el ID al mapa
+        return datosIngreso;
+      }).toList();
+
+      setState(() {});
+    } catch (e) {
+      print('Error al obtener la colección de ingresos: $e');
+    }
+  }
+
+  Future<void> guardarModificaciones(Map<String, dynamic> ingresoData) async {
+    try {
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(widget.DocId);
+
+      CollectionReference ingresosCollectionRef =
+          userDocRef.collection('ingresos');
+
+      // Actualiza el documento de ingreso en Firestore
+      await ingresosCollectionRef.doc(ingresoData['id']).update({
+        'tipo': tipoController.text,
+        'descripcion': descripcionController.text,
+        'monto': double.parse(montoController.text),
+      });
+
+      // Muestra un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Modificaciones guardadas con éxito'),
+        ),
+      );
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => IngresoUpdateView(DocId:widget.DocId),
+          ),
+        );
+      });
+    } catch (e) {
+      // Muestra un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al guardar modificaciones: $e'),
+        ),
+      );
+      print(e);
+    }
+  }
+
+  Future<void> eliminarIngreso(String ingresoId) async {
+    try {
+      DocumentReference userDocRef =
+          FirebaseFirestore.instance.collection('users').doc(widget.DocId);
+
+      CollectionReference ingresosCollectionRef =
+          userDocRef.collection('ingresos');
+
+      // Elimina el documento de ingreso en Firestore
+      await ingresosCollectionRef.doc(ingresoId).delete();
+
+      // Muestra un mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ingreso eliminado con éxito'),
+        ),
+      );
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => IngresoUpdateView(DocId:widget.DocId),
+          ),
+        );
+      });
+    } catch (e) {
+      // Muestra un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar el ingreso: $e'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,21 +135,25 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
               'Modificar ingresos',
               style: TextStyle(
                 fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF041F33), // Color del texto
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF041F33),
               ),
             ),
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: widget.jsonData.length,
+              itemCount: jsonData.length,
               itemBuilder: (context, index) {
-                final ingresoData = widget.jsonData[index];
+                final ingresoData = jsonData[index];
 
                 return GestureDetector(
                   onTap: () {
-                    // Retrasa la navegación al modal para que la animación sea visible
                     Future.delayed(Duration(milliseconds: 300), () {
+                      // Asigna los valores actuales a los controladores
+                      tipoController.text = ingresoData['tipo'];
+                      descripcionController.text = ingresoData['descripcion'];
+                      montoController.text = ingresoData['monto'].toString();
+
                       showModalBottomSheet(
                         context: context,
                         builder: (context) {
@@ -91,21 +170,24 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
                                   ),
                                 ),
                                 DropdownButtonFormField<String>(
-                                  value: ingresoData['tipo'], // Valor inicial
+                                  value: tipoController.text,
                                   items: <String>[
                                     'Nomina',
                                     'Donación familiar',
                                     'Utilidad negocio/empresa',
-                                    // Agrega más tipos según tus necesidades
-                                  ].map<DropdownMenuItem<String>>((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(value),
-                                    );
-                                  }).toList(),
+                                    'tipo1',
+                                    'tipo2',
+                                  ].map<DropdownMenuItem<String>>(
+                                    (String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(value),
+                                      );
+                                    },
+                                  ).toList(),
                                   onChanged: (String? newValue) {
                                     setState(() {
-                                      ingresoData['tipo'] = newValue; // Actualiza el valor seleccionado
+                                      tipoController.text = newValue ?? '';
                                     });
                                   },
                                   decoration: InputDecoration(
@@ -113,54 +195,56 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
                                   ),
                                 ),
                                 TextFormField(
-                                  initialValue: ingresoData['descripcion'],
+                                  controller: descripcionController,
                                   decoration: InputDecoration(
                                     labelText: 'Descripción',
                                   ),
                                 ),
                                 TextFormField(
-                                  initialValue: ingresoData['monto'],
+                                  controller: montoController,
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     labelText: 'Monto',
                                   ),
                                 ),
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Acción cuando se guarda la modificación
-                                        Navigator.pop(context); // Cierra el modal
+                                        // Guarda las modificaciones
+                                        guardarModificaciones(ingresoData);
+                                        Navigator.pop(context);
                                       },
                                       child: Text('Guardar'),
                                       style: ButtonStyle(
                                         backgroundColor:
-                                            MaterialStateProperty.all<Color>(Color(0xFF041F33)),
+                                            MaterialStateProperty.all<Color>(
+                                                Color(0xFF041F33)),
                                       ),
                                     ),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Mostrar un diálogo de confirmación
                                         showDialog(
                                           context: context,
                                           builder: (BuildContext context) {
                                             return AlertDialog(
                                               title: Text('Confirmación'),
-                                              content: Text('¿Estás seguro de que deseas eliminar este ingreso?'),
+                                              content: Text(
+                                                  '¿Estás seguro de que deseas eliminar este ingreso?'),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () {
-                                                    Navigator.of(context).pop(); // Cierra el diálogo
+                                                    Navigator.pop(context);
                                                   },
                                                   child: Text('No'),
                                                 ),
                                                 TextButton(
                                                   onPressed: () {
-                                                    // Acción cuando se confirma la eliminación del ingreso
-                                                    // Coloca aquí la lógica para eliminar el ingreso
-                                                    Navigator.of(context).pop(); // Cierra el diálogo
-                                                    // Puedes mostrar un mensaje de éxito o realizar otras acciones después de eliminar
+                                                    // Elimina el ingreso
+                                                    eliminarIngreso(ingresoData['id']);
+                                                    Navigator.of(context).pop();
                                                   },
                                                   child: Text('Sí'),
                                                 ),
@@ -174,7 +258,9 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
                                         color: Colors.white,
                                       ),
                                       style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.red),
                                       ),
                                     ),
                                   ],
@@ -188,7 +274,6 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
                   },
                   onTapCancel: () {
                     setState(() {
-                      // Restaura la escala del Card al valor original
                       cardScale = 1.0;
                     });
                   },
@@ -214,3 +299,40 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
   }
 }
 
+
+
+
+
+final List<Map<String, dynamic>> jsonData = [
+{
+  "tipo": "Nomina",
+  "descripcion": "Pago recibido de nomina mensual",
+  "monto": "5000",
+},
+    {
+  "tipo": "Donación familiar",
+  "descripcion": "Ingreso proporcionado por familiar",
+  "monto": "2000",
+},
+    {
+  "tipo": "Utilidad negocio/empresa",
+  "descripcion": "Ganancias negocio dulces",
+  "monto": "1000",
+},
+    {
+  "tipo": "Donación familiar",
+  "descripcion": "Dinero de mi papá",
+  "monto": "2355",
+},
+    {
+  "tipo": "Utilidad negocio/empresa",
+  "descripcion": "Ganancias de ventas",
+  "monto": "9000",
+},
+    {
+  "tipo": "Donación familiar",
+  "descripcion": "Dinero de mi mamá",
+  "monto": "1300",
+},
+// Agrega más elementos JSON según sea necesario
+];

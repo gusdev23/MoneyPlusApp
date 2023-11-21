@@ -7,19 +7,32 @@ import 'package:money_plus_app/user_screens/metas_screen.dart';
 
 
 class UserMain extends StatefulWidget {
+  final String userDocId;
+  UserMain({required this.userDocId});
+
   @override
-  _UserMain createState() => _UserMain();
+  _UserMain createState() => _UserMain(userDocIdState: userDocId);
 }
 
 class _UserMain extends State<UserMain> {
   int _selectedIndex = 0;
+  String userDocIdState;
+  late List<Widget> _widgetOptions;
 
-  static List<Widget> _widgetOptions = <Widget>[
-    IngresoScreen(),
-    EgresoScreen(),
-    BalanceScreen(),
-    MetasceScreen()
-  ];
+  _UserMain({required this.userDocIdState});
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Inicializa _widgetOptions después de que el estado está completamente configurado
+    _widgetOptions = <Widget>[
+      IngresoScreen(DocId: userDocIdState),
+      EgresoScreen(DocId: userDocIdState),
+      BalanceScreen(docId: userDocIdState),
+      MetasceScreen()
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {

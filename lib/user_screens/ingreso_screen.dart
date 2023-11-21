@@ -4,6 +4,8 @@ import 'package:money_plus_app/user_views/ingreso_dashboard_view.dart';
 import 'package:money_plus_app/user_views/ingreso_update_view.dart';
 
 class IngresoScreen extends StatelessWidget{
+  final String DocId;
+  IngresoScreen({required this.DocId});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,9 +27,9 @@ class IngresoScreen extends StatelessWidget{
           ),
           body: TabBarView(
             children: [
-              IngresoDashboardView(),
-              IngresoAddView(),
-              IngresoUpdateView(),
+              IngresoDashboardView(DocId: DocId),
+              IngresoAddView(DocId: DocId),
+              IngresoUpdateView(DocId: DocId),
             ],
           ),
         ),
