@@ -376,13 +376,13 @@ double calcularMontoAGuardar(DateTime fechaObjetivo, String frecuencia, double m
   double montoAGuardar = montoMeta / mesesRestantes;
 
   switch (frecuencia) {
-    case 'Diario':
+    case 'diario':
       montoAGuardar /= 30; // asumiendo un mes de 30 días
       break;
-    case 'Semanal':
+    case 'semanal':
       montoAGuardar /= 4; // asumiendo un mes de 4 semanas
       break;
-    case 'Quincenal':
+    case 'quincenal':
       montoAGuardar /= 2;
       break;
     // Para 'Mensual', no se hace ninguna modificación
@@ -398,13 +398,13 @@ int calcularTotalPlazos(DateTime fechaObjetivo, String frecuencia) {
   int totalPlazos = mesesRestantes;
 
   switch (frecuencia) {
-    case 'Diario':
+    case 'diario':
       totalPlazos *= 30; // asumiendo un mes de 30 días
       break;
-    case 'Semanal':
+    case 'semanal':
       totalPlazos *= 4; // asumiendo un mes de 4 semanas
       break;
-    case 'Quincenal':
+    case 'quincenal':
       totalPlazos *= 2;
       break;
     // Para 'Mensual', no se hace ninguna modificación

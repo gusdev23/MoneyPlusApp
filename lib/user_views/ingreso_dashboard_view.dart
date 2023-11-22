@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 class IngresoDashboardView extends StatelessWidget {
   final String DocId;
-
+  
   IngresoDashboardView({required this.DocId});
 
   @override

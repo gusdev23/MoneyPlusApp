@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:money_plus_app/user_main.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await initializeDateFormatting('es_ES', null);
   runApp(const MyApp());
 }
 
