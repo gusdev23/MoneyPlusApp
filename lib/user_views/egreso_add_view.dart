@@ -42,13 +42,38 @@ class _EgresoAddViewState extends State<EgresoAddView> {
                 DropdownButtonFormField(
                   items: [
                     DropdownMenuItem(
-                      value: 'tipo1',
-                      child: Text('Tipo de egreso 1'),
+                      value: 'Hogar',
+                      child: Text('Hogar'),
                     ),
                     DropdownMenuItem(
-                      value: 'tipo2',
-                      child: Text('Tipo de egreso 2'),
+                      value: 'Alimentación',
+                      child: Text('Alimentación'),
                     ),
+                    DropdownMenuItem(
+                      value: 'Transporte',
+                      child: Text('Transporte'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Ocio',
+                      child: Text('Ocio'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Salud',
+                      child: Text('Salud'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Deudas',
+                      child: Text('Deudas'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Ahorros/Inversiones',
+                      child: Text('Ahorros/Inversiones'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Educación',
+                      child: Text('Educación'),
+                    ),
+                    
                   ],
                   onChanged: (value) {
                     tipoController.text = value.toString();

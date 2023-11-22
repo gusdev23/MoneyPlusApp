@@ -144,12 +144,12 @@ class LoginForm extends StatelessWidget {
               backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
             ),
           ),
-          TextButton(
-            onPressed: () {
-              // Lógica para recuperar contraseña
-            },
-            child: Text('¿Olvidaste tu contraseña?'),
-          ),
+          // TextButton(
+          //   onPressed: () {
+          //     // Lógica para recuperar contraseña
+          //   },
+          //   child: Text('¿Olvidaste tu contraseña?'),
+          // ),
         ],
       ),
     );

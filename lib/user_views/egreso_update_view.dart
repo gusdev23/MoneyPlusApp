@@ -102,7 +102,7 @@ class _EgresoUpdateViewState extends State<EgresoUpdateView> {
       // Muestra un mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('egreso eliminado con éxito'),
+          content: Text('Egreso eliminado con éxito'),
         ),
       );
       Future.delayed(Duration(seconds: 2), () {
@@ -176,8 +176,10 @@ class _EgresoUpdateViewState extends State<EgresoUpdateView> {
                                     'Alimentación',
                                     'Transporte',
                                     'Ocio',
-                                    'tipo1',
-                                    'tipo2',
+                                    'Salud',
+                                    'Deudas',
+                                    'Ahorros/Inversiones',
+                                    'Educación',
                                   ].map<DropdownMenuItem<String>>(
                                     (String value) {
                                       return DropdownMenuItem<String>(

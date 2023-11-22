@@ -3,24 +3,31 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:money_plus_app/user_screens/balance_screen.dart';
+import 'package:money_plus_app/user_screens/metas_screen.dart';
 import 'package:money_plus_app/user_views/meta_dashboard_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MetaInfoView extends StatelessWidget {
   final Map<String, dynamic> metaData;
+  final String DocId;
+  final String metaDocId; // Agrega el campo para el ID del documento
 
-  MetaInfoView({required this.metaData});
+  MetaInfoView({required this.metaData, required this.DocId, required this.metaDocId});
 
   @override
   Widget build(BuildContext context) {
     final String nombre = metaData['nombre'];
-    final int montoMeta = metaData['montoMeta'];
-    final int montoActual = metaData['montoActual'];
-    final int montoPlazo = metaData['montoPlazo'];
+    final montoMeta = double.parse(metaData['montoMeta']);
+    final montoActual = double.parse(metaData['montoActual']);
+    final montoPlazo = double.parse(metaData['montoPlazo']);
     final int totalPlazos = metaData['totalPlazos'];
     final int actualPlazo = metaData['actualPlazo'];
     final String plazo = metaData['plazo'];
+    final bool metaCumplida=metaData['metaCumplida'];
     final DateTime f_inicio=DateFormat("dd/MM/yyyy").parse(metaData['fechaInicio'])   ;
     final DateTime f_objetivo= DateFormat("dd/MM/yyyy").parse(metaData['fechaObjetivo']);
+    final TextEditingController nombreMetaController = TextEditingController();
 
     Map<String, String> Plazos = {
       "diario": "Día",
@@ -29,7 +36,108 @@ class MetaInfoView extends StatelessWidget {
       "mensual": "Mes",
     };
 
+    void cambiarNombreMeta()async{
+      try{
+        DocumentReference metaDocRef =
+            FirebaseFirestore.instance.collection('users').doc(DocId).collection('metas').doc(metaDocId);
+        if(nombreMetaController.text !=""){
+          Map<String, dynamic> updates = {
+            'nombre':nombreMetaController.text 
+          };
+          await metaDocRef.update(updates);
 
+          await Future.delayed(Duration(milliseconds: 500));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MetasView(DocId: DocId),
+            ),
+          );
+        }
+        else{
+           AlertDialog(
+            title: Text('Cuidado'),
+            content: Text('Debes agregar un nombre.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cierra el AlertDialog
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        }
+      }catch(e){
+        print('Error durante la actualización en Firebase: $e');
+      }
+    }
+
+    void agregarAhorro() async {
+      try {
+        DocumentReference metaDocRef =
+            FirebaseFirestore.instance.collection('users').doc(DocId).collection('metas').doc(metaDocId);
+        print(metaDocId);
+        print(actualPlazo);
+        print(totalPlazos);
+        if (metaData['actualPlazo'] == metaData['totalPlazo']) {
+          metaData['metaCumplida'] = true;
+        }
+
+        Map<String, dynamic> updates = {
+          'montoActual': (double.parse(metaData['montoActual']) + double.parse(metaData['montoPlazo'])).toString(),
+          'actualPlazo': (metaData['actualPlazo'] as int) + 1,
+        };
+
+        if (actualPlazo + 1 == totalPlazos) {
+          print("cumplido");
+
+          updates['metaCumplida'] = true;
+          print("cumplido");
+        }
+
+        await metaDocRef.update(updates);
+
+        await Future.delayed(Duration(milliseconds: 500));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MetasView(DocId: DocId),
+          ),
+        );
+      } catch (e) {
+        print('Error durante la actualización en Firebase: $e');
+      }
+    }
+
+    eliminarMeta() async {
+      try {
+        DocumentReference metaDocRef =
+              FirebaseFirestore.instance.collection('users').doc(DocId).collection('metas').doc(metaDocId);
+
+        
+        // Elimina el documento de egreso en Firestore
+        await metaDocRef.delete();
+        print('Documento eliminado con éxito.');
+
+        // Muestra un mensaje de éxito
+        
+        await Future.delayed(Duration(milliseconds: 500));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MetasView(DocId: DocId),
+          ),
+        );
+      } catch (e) {
+        // Muestra un mensaje de error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al eliminar la meta: $e'),
+          ),
+        );
+      }
+    }
     //Manejo de monedas
     NumberFormat formatMX = NumberFormat.simpleCurrency(locale: 'es_MX');
     formatMX.maximumFractionDigits = 0;
@@ -74,11 +182,11 @@ class MetaInfoView extends StatelessWidget {
                       InkWell(
                         onTap: () {
                           Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MetasView(),
-                          ),
-                        );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MetasView(DocId:DocId),
+                            ),
+                          );
                         },
                         child: Icon(Icons.arrow_back_outlined, color: Color(0xFF041F33)),
                       ),
@@ -105,13 +213,13 @@ class MetaInfoView extends StatelessWidget {
                                   children: [
                                     TextField(
                                       decoration: InputDecoration(labelText: 'Nuevo nombre'),
-                                      
+                                      controller: nombreMetaController,
                                     ),
                                     SizedBox(height: 20),
                                     ElevatedButton(
                                       onPressed: () {
-                                        // Implementa la lógica para guardar el nuevo nombre de la meta aquí
-                                        Navigator.of(context).pop(); // Cierra el modal
+                                        cambiarNombreMeta();
+                                        Navigator.pop(context); // Cierra el modal
                                       },
                                       child: Text('Guardar'),            
                                     ),
@@ -136,6 +244,7 @@ class MetaInfoView extends StatelessWidget {
                                   TextButton(
                                     child: Text('Cancelar'),
                                     onPressed: () {
+                                      
                                       Navigator.of(context).pop(); // Cierra el diálogo
                                     },
                                   ),
@@ -147,7 +256,7 @@ class MetaInfoView extends StatelessWidget {
                                       ),
                                     ),
                                     onPressed: () {
-                                      // Implementa la lógica para eliminar la meta aquí
+                                      eliminarMeta();
                                       Navigator.of(context).pop(); // Cierra el diálogo
                                     },
                                   ),
@@ -250,43 +359,60 @@ class MetaInfoView extends StatelessWidget {
                               ),
                             ),
                             padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                            child: Text(
-                              '${Plazos.containsKey(plazo) ? Plazos[plazo] : plazo} ' +actualPlazo.toString(),
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: metaCumplida
+                            ? Text(
+                                '¡Felicidades!',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              )
+                            : Text(
+                                '${Plazos.containsKey(plazo) ? Plazos[plazo] : plazo} ' +(actualPlazo+1).toString(),
+                                style: TextStyle(color: Colors.white),
+                              ),
                           ),
                           InkWell(
                             onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('¿Está seguro que lo deseas marcar como ahorrado?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        child: Text('Cancelar'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop(); // Cierra el cuadro de diálogo
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text('Sí'),
-                                        onPressed: () {
-                                          // Realiza la acción de confirmación aquí
-                                          Navigator.of(context).pop(); // Cierra el cuadro de diálogo
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
+                              if(!metaCumplida)
+                              {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('¿Está seguro que lo deseas marcar como ahorrado?'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: Text('Cancelar'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(); // Cierra el cuadro de diálogo
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Sí'),
+                                          onPressed: ()  {
+                                          
+                                            agregarAhorro();
+
+                                            Navigator.pop(context);                                                                           
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                              
                             },
                             child: Row(
-                              children: [
-                                Icon(Icons.check_box_outline_blank_outlined, color: Colors.grey),
-                                SizedBox(width: 10),
-                                Text('\$${montoPlazo}', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ],
+                              children: metaCumplida
+                              ? [
+                                  Icon(Icons.check_circle, color: Colors.green), // Cambiar a un ícono de círculo con marca de verificación
+                                  SizedBox(width: 10),
+                                  //Text('¡Meta cumplida!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                                ]
+                              : [
+                                  Icon(Icons.check_box_outline_blank_outlined, color: Colors.grey),
+                                  SizedBox(width: 10),
+                                  Text('\$${montoPlazo.toStringAsFixed(2)}', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ],
                             ),
                           )
                         ],
@@ -294,10 +420,14 @@ class MetaInfoView extends StatelessWidget {
                       SizedBox(height: 10),
                       Align(
                         alignment: Alignment.bottomCenter,
-                        child: Text(
-                          formatoFecha.format(fechaPlazo()),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                        child: metaCumplida
+                        ? Text(
+                            '¡Meta cumplida!', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                          )
+                        : Text(
+                            formatoFecha.format(fechaPlazo()),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                       ),
                       
                     ],
@@ -318,12 +448,12 @@ class MetaInfoView extends StatelessWidget {
               itemCount: totalPlazos,
               itemBuilder: (BuildContext context, int index) {
                 var cumplido = false;
-                if(index+1<actualPlazo){
+                if(index+1<=actualPlazo){
                   cumplido=true;
                 }
                 return ListTile(
                   leading: Icon(cumplido ? Icons.check_box : Icons.check_box_outline_blank_rounded, color: cumplido ? Colors.green : Colors.grey,),
-                  title: Text('\$${montoPlazo}',style: TextStyle(
+                  title: Text('\$${montoPlazo.toStringAsFixed(2)}',style: TextStyle(
                     decoration: cumplido ? TextDecoration.lineThrough : TextDecoration.none,
                   ),),
                   subtitle: Text('${Plazos.containsKey(plazo) ? Plazos[plazo] : plazo} ${index + 1} de $totalPlazos'),

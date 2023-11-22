@@ -30,7 +30,7 @@ class _UserMain extends State<UserMain> {
       IngresoScreen(DocId: userDocIdState),
       EgresoScreen(DocId: userDocIdState),
       BalanceScreen(docId: userDocIdState),
-      MetasceScreen()
+      MetasceScreen(DocId: userDocIdState)
     ];
   }
 

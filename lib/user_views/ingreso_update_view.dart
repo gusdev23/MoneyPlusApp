@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:money_plus_app/user_screens/ingreso_screen.dart';
 
 class IngresoUpdateView extends StatefulWidget {
   final String DocId;
@@ -73,7 +74,8 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => IngresoUpdateView(DocId:widget.DocId),
+            builder:(context) => IngresoScreen(DocId: widget.DocId)
+            //builder: (context) => IngresoUpdateView(DocId:widget.DocId),
           ),
         );
       });
@@ -175,8 +177,10 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
                                     'Nomina',
                                     'Donación familiar',
                                     'Utilidad negocio/empresa',
-                                    'tipo1',
-                                    'tipo2',
+                                    'Renta de Propiedad',
+                                    'Pensión/Seguridad Social',
+                                    'Ingresos por Inversiones',
+                                    'Adicionales',
                                   ].map<DropdownMenuItem<String>>(
                                     (String value) {
                                       return DropdownMenuItem<String>(

@@ -42,12 +42,32 @@ class _IngresoAddViewState extends State<IngresoAddView> {
                 DropdownButtonFormField(
                   items: [
                     DropdownMenuItem(
-                      value: 'tipo1',
-                      child: Text('Tipo de ingreso 1'),
+                      value: 'Nomina',
+                      child: Text('Nomina'),
                     ),
                     DropdownMenuItem(
-                      value: 'tipo2',
-                      child: Text('Tipo de ingreso 2'),
+                      value: 'Renta de Propiedad',
+                      child: Text('Renta de Propiedad'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Donación',
+                      child: Text('Donación'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Utilidad negocio/empresa',
+                      child: Text('Utilidad negocio/empresa'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Pensión/Seguridad Social',
+                      child: Text('Pensión/Seguridad Social'),
+                    ),
+                     DropdownMenuItem(
+                      value: 'Ingresos por Inversiones',
+                      child: Text('Ingresos por Inversiones'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Adicionales',
+                      child: Text('Adicionales'),
                     ),
                   ],
                   onChanged: (value) {

@@ -1,22 +1,31 @@
-import 'dart:ffi';
+
+
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:money_plus_app/user_views/meta_dashboard_view.dart';
 
 class MetaAddView extends StatelessWidget {
+  final String DocId;
+
+  MetaAddView({required this.DocId});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: MotivoMeta(),
+        body: MotivoMeta(DocId: DocId,),
       ),
     );
   }
 }
 
-
 class MotivoMeta extends StatelessWidget {
+  final String DocId;
+
+  MotivoMeta({required this.DocId});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -77,7 +86,6 @@ class MotivoMeta extends StatelessWidget {
                   title: 'Solo guardar',
                   onPressed: () {
                     _mostrarDetallesMeta(context, 'Solo guardar');
-
                   },
                 ),
               ],
@@ -89,7 +97,7 @@ class MotivoMeta extends StatelessWidget {
               _mostrarDetallesMeta(context, 'Otro');
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF094976), 
+              backgroundColor: Color(0xFF094976),
             ),
             child: Text('Otro'),
           ),
@@ -97,35 +105,36 @@ class MotivoMeta extends StatelessWidget {
       ),
     );
   }
-    void _mostrarDetallesMeta(BuildContext context, String selectedGoal) {
+
+  void _mostrarDetallesMeta(BuildContext context, String selectedGoal) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MetaAddDetails(selectedGoal)),
+      MaterialPageRoute(builder: (context) => MetaAddDetails(selectedGoal,DocId)),
     );
   }
 }
 
 class MetaAddDetails extends StatefulWidget {
   final String selectedGoal;
-
-  MetaAddDetails(this.selectedGoal);
+  final String DocId;
+  MetaAddDetails(this.selectedGoal, this.DocId);
 
   @override
   _MetaAddDetailsState createState() => _MetaAddDetailsState();
 }
 
 class _MetaAddDetailsState extends State<MetaAddDetails> {
-  DateTime? _selectedDate;  
+  DateTime? _selectedDate;
   TextEditingController _goalController = TextEditingController();
   TextEditingController montoController = TextEditingController();
   TextEditingController montoGuardarController = TextEditingController();
   bool _showSecondCard = false;
-  
+
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),  
-      firstDate: DateTime.now(), 
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
       lastDate: DateTime(2101),
     );
 
@@ -136,17 +145,16 @@ class _MetaAddDetailsState extends State<MetaAddDetails> {
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-    void fecha()async{
+    void fecha() async {
       await initializeDateFormatting('es_ES', null);
     }
+
     fecha();
     DateFormat formatoFecha = DateFormat('d MMM yyyy', 'es_ES');
     _goalController = TextEditingController(text: widget.selectedGoal);
-    montoController = TextEditingController(text: '10000');
+    final TextEditingController frecuenciaController = TextEditingController();
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -201,14 +209,12 @@ class _MetaAddDetailsState extends State<MetaAddDetails> {
                   ),
                   SizedBox(height: 8.0),
                   Text(
-                    _selectedDate != null
-                        ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-                        : '',
+                    _selectedDate != null ? formatoFecha.format(_selectedDate!) : '',
                     style: TextStyle(fontSize: 16.0, color: Colors.red, fontWeight: FontWeight.bold),
                   ),
                   if (!_showSecondCard)
                     TextButton.icon(
-                      onPressed: !_showSecondCard ? () => _selectDate(context) : null, // Deshabilitar si _showSecondCard es true
+                      onPressed: !_showSecondCard ? () => _selectDate(context) : null,
                       icon: Icon(Icons.edit_calendar_rounded),
                       label: Text('Seleccionar fecha'),
                       style: ButtonStyle(
@@ -217,17 +223,15 @@ class _MetaAddDetailsState extends State<MetaAddDetails> {
                     ),
                   SizedBox(height: 16.0),
                   if (!_showSecondCard)
-
                     ElevatedButton(
                       onPressed: () {
-                        // Validar que los campos no estén vacíos
                         if (_goalController.text.isNotEmpty &&
-                            _selectedDate != null && montoController.text.isNotEmpty) {
+                            _selectedDate != null &&
+                            montoController.text.isNotEmpty) {
                           setState(() {
                             _showSecondCard = true;
                           });
-                        }
-                        else {
+                        } else {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -268,26 +272,37 @@ class _MetaAddDetailsState extends State<MetaAddDetails> {
                         ),
                         SizedBox(width: 8.0),
                         Expanded(
-                          child: DropdownButton<String>(
-                            items: ['Diario', 'Semanal', 'Quincenal', 'Mensual']
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              setState(() {
-                                double? montoMeta = double.tryParse(montoController.text);
-                                if (montoMeta != null) {                                  
-                                   montoGuardarController.text =
-                                    calcularMontoAGuardar(_selectedDate!, value!,montoMeta)
-                                    .toStringAsFixed(2); 
-                                }
-                              });
+                          child: DropdownButtonFormField(
+                            items: [
+                              DropdownMenuItem(
+                                value: 'diario',
+                                child: Text('Diario'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'semanal',
+                                child: Text('Semanal'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'quincenal',
+                                child: Text('Quincenal'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'mensual',
+                                child: Text('Mensual'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              frecuenciaController.text = value.toString();
+                              double? montoMeta = double.tryParse(montoController.text);
+                              if (montoMeta != null) {
+                                montoGuardarController.text =
+                                    calcularMontoAGuardar(_selectedDate!, value!, montoMeta).toStringAsFixed(2);
+                              }
                             },
-                            hint: Text('Seleccionar frecuencia'),
-                          ),
+                            decoration: InputDecoration(
+                              labelText: 'Seleccionar frecuencia',
+                            ),
+                          ), 
                         ),
                       ],
                     ),
@@ -313,7 +328,32 @@ class _MetaAddDetailsState extends State<MetaAddDetails> {
                     ),
                     SizedBox(height: 16.0),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        CollectionReference metasCollection = FirebaseFirestore.instance.collection('users').doc(widget.DocId).collection('metas');
+
+                        DocumentReference nuevaMetaRef = metasCollection.doc();
+                        print(frecuenciaController.text);
+                        Map<String, dynamic> nuevaMeta = {
+                          'nombre': _goalController.text,
+                          'montoMeta': montoController.text,
+                          'fechaInicio': DateFormat('dd/MM/yyyy').format(DateTime.now()).toString(),
+                          'fechaObjetivo': DateFormat('dd/MM/yyyy').format(_selectedDate!).toString() ,
+                          'plazo': frecuenciaController.text,
+                          'totalPlazos': calcularTotalPlazos(_selectedDate!, frecuenciaController.text),
+                          'actualPlazo': 0,
+                          'metaCumplida': false,
+                          'montoActual': '0',
+                          'montoPlazo': calcularMontoAGuardar(_selectedDate!, frecuenciaController.text, double.parse(montoController.text)).toString(),
+                        };
+                        print(nuevaMeta);
+                        await nuevaMetaRef.set(nuevaMeta);
+                        await Future.delayed(Duration(milliseconds: 500));
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MetasView(DocId: widget.DocId),
+                          ),
+                        );
                         // Acción cuando se presiona el botón "Guardar meta"
                         print('Guardar meta');
                       },
@@ -349,6 +389,28 @@ double calcularMontoAGuardar(DateTime fechaObjetivo, String frecuencia, double m
   }
 
   return montoAGuardar;
+}
+
+int calcularTotalPlazos(DateTime fechaObjetivo, String frecuencia) {
+  DateTime fechaActual = DateTime.now();
+  int mesesRestantes = fechaObjetivo.month - fechaActual.month + 12 * (fechaObjetivo.year - fechaActual.year);
+
+  int totalPlazos = mesesRestantes;
+
+  switch (frecuencia) {
+    case 'Diario':
+      totalPlazos *= 30; // asumiendo un mes de 30 días
+      break;
+    case 'Semanal':
+      totalPlazos *= 4; // asumiendo un mes de 4 semanas
+      break;
+    case 'Quincenal':
+      totalPlazos *= 2;
+      break;
+    // Para 'Mensual', no se hace ninguna modificación
+  }
+
+  return totalPlazos;
 }
 
 class SavingsCard extends StatelessWidget {
