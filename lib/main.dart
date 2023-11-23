@@ -5,7 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:money_plus_app/user_main.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:flutter/services.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -19,6 +19,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp, // Bloquear en orientación vertical
+    ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Money+',

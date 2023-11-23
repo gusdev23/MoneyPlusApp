@@ -181,31 +181,3 @@ class DynamicCardList extends StatelessWidget {
 
 
 
-final List<Map<String, dynamic>> jsonData = [
-    {
-      "tipo": "Hogar",
-      "monto": "2000",
-      "descripcion": "Renta casa",
-    },
-    {
-      "tipo": "Alimentación",
-      "monto": "1000",
-      "descripcion": "Comida mensual",
-    },
-    {
-      "tipo": "Transporte",
-      "monto": "2500",
-      "descripcion": "Transporte",
-    },
-    {
-      "tipo": "Hogar",
-      "monto": "500",
-      "descripcion": "Compra de gas",
-    },
-    {
-      "tipo": "Ocio",
-      "monto": "3000",
-      "descripcion": "Actividade de ocio",
-    },
-    // Agrega más elementos JSON según sea necesario
-  ];

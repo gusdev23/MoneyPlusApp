@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 class BalanceView extends StatelessWidget {
   final List<Map<String, dynamic>> jsonIngresos;
   final List<Map<String, dynamic>> jsonEgresos;
@@ -184,32 +183,4 @@ class BalanceView extends StatelessWidget {
       ],
     );
   }
-
-  // Widget buildPieChart(double totalIncome,double totalExpense) {
-  //   double total = totalIncome + totalExpense;
-  //   double incomePercentage = totalIncome / total;
-  //   double expensePercentage = totalExpense / total;
-
-  //   return PieChart(
-  //     PieChartData(
-  //       sections: [
-  //         PieChartSectionData(
-  //           value: incomePercentage * 100,
-  //           color: Colors.green,
-  //           title: '\$${totalIncome.toStringAsFixed(2)}',
-  //           radius: 80,
-  //         ),
-  //         PieChartSectionData(
-  //           value: expensePercentage * 100,
-  //           color: Colors.red,
-  //           title: '\$${totalExpense.toStringAsFixed(2)}',
-  //           radius: 80,
-  //         ),
-  //       ],
-  //       borderData: FlBorderData(show: false),
-  //       sectionsSpace: 0,
-  //       centerSpaceRadius: 0,
-  //     ),
-  //   );
-  // }
 }

@@ -307,36 +307,3 @@ class _IngresoUpdateViewState extends State<IngresoUpdateView> {
 
 
 
-final List<Map<String, dynamic>> jsonData = [
-{
-  "tipo": "Nomina",
-  "descripcion": "Pago recibido de nomina mensual",
-  "monto": "5000",
-},
-    {
-  "tipo": "Donación familiar",
-  "descripcion": "Ingreso proporcionado por familiar",
-  "monto": "2000",
-},
-    {
-  "tipo": "Utilidad negocio/empresa",
-  "descripcion": "Ganancias negocio dulces",
-  "monto": "1000",
-},
-    {
-  "tipo": "Donación familiar",
-  "descripcion": "Dinero de mi papá",
-  "monto": "2355",
-},
-    {
-  "tipo": "Utilidad negocio/empresa",
-  "descripcion": "Ganancias de ventas",
-  "monto": "9000",
-},
-    {
-  "tipo": "Donación familiar",
-  "descripcion": "Dinero de mi mamá",
-  "monto": "1300",
-},
-// Agrega más elementos JSON según sea necesario
-];
